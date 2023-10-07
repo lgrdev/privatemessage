@@ -1,0 +1,10 @@
+config.prod.php
+config.dev.php
+
+/vendor/
+/sample/
+/cache/*.php
+/.vscode/
+
+composer.phar
+composer.lock

@@ -1,0 +1,29 @@
+{
+    "name":"lgrdev/privatemessage",
+    "description":"uniq private message reader",
+    "version": "1.0.0",
+    "type":"project",
+    "url":"https://privatemessage.ovh",
+    "licence":"MIT",
+    "require": {
+        "twbs/bootstrap": "5.3.2",
+        "ramsey/uuid": "^4.7",
+        "predis/predis": "^2.2",
+        "twig/twig": "^3.7",
+        "php-di/php-di": "^7.0"
+    },
+    "config": {
+        "optimize-autoloader":true
+    },
+    "authors": [
+        {
+            "name": "lgrdev",
+            "email": "lgrdev@lgrdev.ovh"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "LgrDev\\":"src"
+        }
+    }
+}
