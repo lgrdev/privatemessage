@@ -51,7 +51,7 @@ class PrivateMessage
 
             $key = $this->stockage->addMessage($message);
 
-            $link = "https://lgrdev.ovh/motpassesecret/?secret=" . $key;
+            $link = 'https://'.$_SERVER['HTTP_HOST'].'/?secret=' . $key;
 
             // Render linksecret template
             echo $this->twig->render('linksecret.twig', ["link" => $link]);

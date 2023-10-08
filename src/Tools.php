@@ -45,7 +45,7 @@ class Tools
     public function createKey(): string
     {
 
-        $newkey = Uuid::uuid4()->toString();
+        $newkey = str_replace('-','', Uuid::uuid4()->toString());
 
         return $newkey;
 
