@@ -32,7 +32,6 @@ class PrivateMessage
     {
         $this->stockage = $redis;
         $this->tools = $tools;
-
         $this->twig     = $twig;
     }
 
@@ -48,8 +47,9 @@ class PrivateMessage
             }
 
             $message = $_POST['comment'];
-
-            $key = $this->stockage->addMessage($message);
+            $expirein = (isset($_POST['expirein']) && !empty($_POST['expirein'])) ? $_POST['expirein'] : '1';
+            
+            $key = $this->stockage->addMessage($message,$expirein);
 
             $link = 'https://'.$_SERVER['HTTP_HOST'].'/?secret=' . $key;
 

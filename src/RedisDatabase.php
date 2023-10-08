@@ -32,9 +32,10 @@ class RedisDatabase
         $this->tools = $tools;
     }
     
-    public function addMessage(string $message): string|null
+    public function addMessage(string $message, string $expiration): string|null
     {
         $key = null;
+        $expire = 3600;
 
         if (!empty($message)) {
 
@@ -42,9 +43,21 @@ class RedisDatabase
            
             $encrypte = $this->tools->crypteMessage($message);
 
+            switch ($expiration) {
+                case '2' : 
+                    $expire = 60*60*24;
+                    break;
+                case '3' : 
+                    $expire = 60*60*24*4;
+                    break;
+                case '4' : 
+                    $expire = 60*60*24*7;
+                    break;
+                default:
+                    $expire = 60*60;
+            }
 
-            $this->redis->set($key, $encrypte, 3600); // 1 minute
-
+            $this->redis->set($key, $encrypte, $expire); 
         }
 
         return $key;
