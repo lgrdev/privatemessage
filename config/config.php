@@ -23,7 +23,16 @@ return [
                                 DI\get(\LgrDev\Tools::class)
                             ),
     */    
-                           
+                         
+    /* uncomment the following lines if you use Memcache */
+    /*
+    \LgrDev\Storage\MemcacheDatabase::class => DI\create()->constructor(
+                                DI\get('mc.host'),
+                                DI\get('mc.port'),
+                                DI\get(\LgrDev\Tools::class)
+                            ),
+    */    
+
     \LgrDev\Storage\RedisDatabase::class => DI\create()->constructor(
                                     DI\get('redis.host'),
                                     DI\get('redis.port'),
