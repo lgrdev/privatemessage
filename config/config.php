@@ -12,26 +12,27 @@ return [
 
     \LgrDev\Tools::class => DI\create()->constructor(),
 
-    /* uncomment the folowing lines if you use PDO
-    \LgrDev\Database::class => \DI\object()->constructor(
-                                    \DI\get('db.type'),
-                                    \DI\get('db.host'),
-                                    \DI\get('db.name'),
-                                    \DI\get('db.user'),
-                                    \DI\get('db.password'),
+    /* uncomment the following lines if you use PDO */
+    /*
+    \LgrDev\Storage\PdoDatabase::class => DI\create()->constructor(
+                                DI\get('db.type'),
+                                DI\get('db.host'),
+                                DI\get('db.name'),
+                                DI\get('db.user'),
+                                DI\get('db.password'),
+                                DI\get(\LgrDev\Tools::class)
+                            ),
+    */    
+                           
+    \LgrDev\Storage\RedisDatabase::class => DI\create()->constructor(
+                                    DI\get('redis.host'),
+                                    DI\get('redis.port'),
+                                    DI\get('redis.auth'),
+                                    DI\get(\LgrDev\Tools::class)
                                 ),
-    */
-
-    \LgrDev\RedisDatabase::class => DI\create()->constructor(
-        DI\get('redis.host'),
-        DI\get('redis.port'),
-        DI\get('redis.auth'),
-        DI\get(\LgrDev\Tools::class)
-    ),
-
-
+ 
     \LgrDev\PrivateMessage::class => DI\create()->constructor(
-        DI\get(\LgrDev\RedisDatabase::class),
+        DI\get(\LgrDev\Storage\RedisDatabase::class),
         DI\get(\LgrDev\Tools::class),
         DI\get(Environment::class)
     ),
