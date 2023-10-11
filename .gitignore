@@ -4,7 +4,6 @@ config.dev.php
 
 /vendor/
 /sample/
-!/cache
 /cache/*.php
 /.vscode/
 
