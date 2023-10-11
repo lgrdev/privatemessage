@@ -28,15 +28,19 @@ class PdoDatabase extends StorageBase // implements StorageInterface
      *
      * @throws \PDOException If there's an issue with the database connection.
      */
-    public function __construct(string $dbtype, string $host, string $dbname, string $username, string $password, Tools $tools)
+    public function __construct(Tools $tools)
     {
         $this->tools = $tools;
         
+        if (!$this->tools->issetEnv('db_dsn') || !$this->tools->issetEnv('db_user')) {
+            throw new \Exception('Parametres PDO non fournis');    
+        }
+
         try {
             // Create a PDO (PHP Data Objects) database connection using the provided parameters.
             // The PDO constructor takes a DSN (Data Source Name) string that specifies the database type, host, and database name.
             // It also requires the username and password for authentication.
-            $this->pdo = new \PDO("$dbtype:host=$host;dbname=$dbname", $username, $password);
+            $this->pdo = new \PDO($this->tools->etEnv('db_dsn'), $this->tools->getEnv('db_user'), $this->tools->getEnv('db_password'));
 
             // Set PDO error mode to exceptions to handle database-related errors as exceptions.
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -62,39 +66,22 @@ class PdoDatabase extends StorageBase // implements StorageInterface
         // Initialize the key as null.
         $key = null;
 
-        // Create a DateTimeImmutable object representing the current date and time.
-        $currentDateTime = new \DateTimeImmutable();
-
-        // Update the expiration time based on the provided expiration setting.
-        switch ($expiration) {
-            case '1':
-                // Message expires in +1 hour.
-                $currentDateTime = $currentDateTime->add(new \DateInterval("PT1H"));
-                break;
-            case '2':
-                $currentDateTime = $currentDateTime->add(new \DateInterval("P1D"));
-                break;
-            case '3':
-                $currentDateTime = $currentDateTime->add(new \DateInterval("P4D"));
-                break;
-            case '4':
-                $currentDateTime = $currentDateTime->add(new \DateInterval("P7D"));
-                break;
-        }
-
-        // Check if the provided message is not empty.
+         // Check if the provided message is not empty.
         if (!empty($message)) {
             // Generate a unique key for the message using the createKey() method.
-            $key = $this->tools->createKey();
+            $key = $this->tools->createMessageKey();
               
             // Encrypt the message using the crypteMessage() method.
             $encryptedMessage = $this->tools->crypteMessage($message);
-            
+ 
+            // Update the expiration time based on the provided expiration setting.
+            $expireDateTime = $this->getDateTimeExpiration($expiration);
+
             // Prepare a SQL query to insert the message into the database with the key, message, and expiration.
             $stmt = $this->pdo->prepare('INSERT INTO privatemessage (msgkey, msgvalue, msgexpireat) VALUES (?, ?, ?)');
 
             // Execute the prepared statement with the key, encrypted message, and expiration date.
-            if ($stmt->execute([$key, $encryptedMessage, $currentDateTime->format('Y-m-d H:i:s')]) === false) {
+            if ($stmt->execute([$key, $encryptedMessage, $expireDateTime->format('Y-m-d H:i:s')]) === false) {
                 // If insertion fails, set the key to null.
                 $key = null;
             }

@@ -21,6 +21,7 @@ abstract class StorageBase implements StorageInterface {
 
     protected function getExpiration(string $expiration): int
     {
+        // by default : 1 hour
         $expire = 3600;
 
         // Update the expiration time based on the provided expiration setting.
@@ -35,7 +36,34 @@ abstract class StorageBase implements StorageInterface {
                 $expire = 60 * 60 * 24 * 7; // 7 days
                 break;
         }
+
         return $expire;
+    }
+
+    protected function getDateTimeExpiration($expiration): \DateTimeImmutable
+    {
+        $expireDateTime = new \DateTimeImmutable();
+
+        // Update the expiration time based on the provided expiration setting.
+        switch ($expiration) {
+
+            case self::ONE_DAY:
+                $expireDateTime = $expireDateTime->add(new \DateInterval("P1D"));
+                break;
+            case self::FOUR_DAYS:
+                $expireDateTime = $expireDateTime->add(new \DateInterval("P4D"));
+                break;
+            case self::SEVEN_DAYS:
+                $expireDateTime = $expireDateTime->add(new \DateInterval("P7D"));
+                break;
+            
+            default :
+                // Message expires in +1 hour.
+                $expireDateTime = $expireDateTime->add(new \DateInterval("PT1H"));
+                break;
+        }
+
+        return  $expireDateTime;
     }
 
 }

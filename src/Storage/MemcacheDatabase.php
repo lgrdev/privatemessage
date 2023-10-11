@@ -21,13 +21,27 @@ class MemcacheDatabase extends StorageBase
      */
     private $store =null;
 
-    function __construct(string $host, int $port, Tools $tools)
+    function __construct(Tools $tools)
     {
-        
-        $this->store = new \Memcached('privatemessage');;
-        $this->store->addServer($host,$port);
-        
         $this->tools = $tools;
+        
+        if (!$this->tools->issetEnv('mc_host') || !$this->tools->issetEnv('mc_port')) {
+            throw new \Exception('Parametres Memcached non fournis');    
+        }     
+        
+        try {
+            $this->store = new \Memcached('privatemessage');
+
+            $this->store->addServer($this->tools->getEnv('mc_host'), intval($this->tools->getEnv('mc_port')));
+        }
+        catch(\MemcachedException $e) {
+            // Handle any exceptions that occur during database connection.
+            // You may want to log the error or take appropriate action depending on your application's needs.
+            // In this example, we re-throw the exception to indicate a failed connection.
+            throw $e;
+        }
+
+
     }
     
     /**
@@ -46,26 +60,13 @@ class MemcacheDatabase extends StorageBase
         }
 
         // Generate a unique key for the message using the createKey() method.
-        $key = $this->tools->createKey();
+        $key = $this->tools->createMessageKey();
         
         // Encrypt the message using the crypteMessage() method.
         $encryptedMessage = $this->tools->crypteMessage($message);
 
-        // Set the default expiration time to 1 hour (3600 seconds).
-        $expire = 3600;
-
-        // Update the expiration time based on the provided expiration setting.
-        switch ($expiration) {
-            case '2':
-                $expire = 60 * 60 * 24; // 24 hours
-                break;
-            case '3':
-                $expire = 60 * 60 * 24 * 4; // 4 days
-                break;
-            case '4':
-                $expire = 60 * 60 * 24 * 7; // 7 days
-                break;
-        }
+        // Set the default expiration time (default : 3600 seconds).
+        $expire = $this->getExpiration($expiration);
 
         // Store the encrypted message in Redis with the generated key and specified expiration time.
         $this->store->set($key, $encryptedMessage, $expire); 

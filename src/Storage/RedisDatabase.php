@@ -21,17 +21,28 @@ class RedisDatabase extends StorageBase
      */
     private $redis =null;
 
-    function __construct(string $host, int $port, string $auth, Tools $tools)
+    function __construct(Tools $tools)
     {
-        
-        $this->redis = new \Redis();
-        $this->redis->connect($host,$port);
-
-        if (!empty($auth)) {
-            $this->redis->auth($auth);
-        }
-        
         $this->tools = $tools;
+        
+        if (!$this->tools->issetEnv('redis_host') || !$this->tools->issetEnv('redis_port')) {
+            throw new \Exception('Parametres Redis non fournis');    
+        }
+
+        try {
+            $this->redis = new \Redis();
+            $this->redis->connect($this->tools->getEnv('redis_host'), intval($this->tools->getEnv('redis_port')));
+
+            if ($this->tools->issetEnv('redis_host')) {
+                $this->redis->auth($this->tools->getEnv('redis_auth'));
+            }
+        }
+        catch (\RedisException $e) {
+            // Handle any exceptions that occur during database connection.
+            // You may want to log the error or take appropriate action depending on your application's needs.
+            // In this example, we re-throw the exception to indicate a failed connection.
+            throw $e;
+        }   
     }
     
     /**
@@ -50,26 +61,13 @@ class RedisDatabase extends StorageBase
         }
 
         // Generate a unique key for the message using the createKey() method.
-        $key = $this->tools->createKey();
+        $key = $this->tools->createMessageKey();
         
         // Encrypt the message using the crypteMessage() method.
         $encryptedMessage = $this->tools->crypteMessage($message);
 
-        // Set the default expiration time to 1 hour (3600 seconds).
-        $expire = 3600;
-
-        // Update the expiration time based on the provided expiration setting.
-        switch ($expiration) {
-            case '2':
-                $expire = 60 * 60 * 24; // 24 hours
-                break;
-            case '3':
-                $expire = 60 * 60 * 24 * 4; // 4 days
-                break;
-            case '4':
-                $expire = 60 * 60 * 24 * 7; // 7 days
-                break;
-        }
+        // Set the default expiration time (default : 3600 seconds).
+        $expire = $this->getExpiration($expiration);
 
         // Store the encrypted message in Redis with the generated key and specified expiration time.
         $this->redis->set($key, $encryptedMessage, $expire); 
