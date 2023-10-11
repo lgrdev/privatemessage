@@ -1,5 +1,6 @@
 config.prod.php
 config.dev.php
+.env
 
 /vendor/
 /sample/
