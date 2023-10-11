@@ -40,7 +40,7 @@ class PdoDatabase extends StorageBase // implements StorageInterface
             // Create a PDO (PHP Data Objects) database connection using the provided parameters.
             // The PDO constructor takes a DSN (Data Source Name) string that specifies the database type, host, and database name.
             // It also requires the username and password for authentication.
-            $this->pdo = new \PDO($this->tools->etEnv('db_dsn'), $this->tools->getEnv('db_user'), $this->tools->getEnv('db_password'));
+            $this->pdo = new \PDO($this->tools->getEnv('db_dsn'), $this->tools->getEnv('db_user'), $this->tools->getEnv('db_password'));
 
             // Set PDO error mode to exceptions to handle database-related errors as exceptions.
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);

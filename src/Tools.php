@@ -19,6 +19,11 @@ class Tools
     private $keyAES128 = 'GmGknh+uKR/Pub5Q34h+4Z+9yLvRPp1ylrhn22EftwL5mhy4yQvEo8dOOsYYmpPJ';
     private $arrEnv = [];
 
+    /**
+     * Constructeur de la classe Tools
+     *
+     * @param string|null $pathenvfile
+     */
     public function __construct(string $pathenvfile = null)
     {
         if ($pathenvfile != null) {
@@ -37,6 +42,12 @@ class Tools
 
     }
 
+    /**
+     * Charge le fichier .env dans le tableau $arrEnv[] 
+     *
+     * @param string $path
+     * @return void
+     */
     public function loadEnv(string $path) :void
     {
         if (!is_readable($path)) {
@@ -59,6 +70,12 @@ class Tools
         }
     }
 
+    /**
+     * Test si la variable de configuration $variable existe
+     *
+     * @param string $variable
+     * @return boolean
+     */
     public function issetEnv(string $variable): bool
     {
 
@@ -66,6 +83,12 @@ class Tools
 
     }
 
+    /**
+     * Récupère la valeur d'un variable d'environnement
+     *
+     * @param string $variable
+     * @return string|null
+     */
     public function getEnv(string $variable): string|null
     {
         $value = null;
@@ -83,6 +106,13 @@ class Tools
         return $value;
     }
     
+    /**
+     * Affecte une valeur à une variable d'environnement
+     *
+     * @param string $variable
+     * @param string $value
+     * @return boolean
+     */
     public function setEnv(string $variable,string $value): bool
     {
         $bReturn = false;
