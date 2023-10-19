@@ -5,15 +5,15 @@ namespace LgrDev\Storage;
 /**
  * Interface for a storage system to add and retrieve messages.
  */
-interface StorageInterface {
-
+interface StorageInterface
+{
     /**
      * Add a message to the storage system with optional expiration.
      *
      * @param string $message    The message to be added.
      * @param string $expiration The expiration setting for the message.
      *                           Specific implementations may interpret this differently.
-     *                           
+     *
      * @return string|null The key under which the message is stored, or null if the operation fails.
      */
     public function addMessage(string $message, string $expiration): string|null;
@@ -28,5 +28,5 @@ interface StorageInterface {
     public function getMessage(string $key): string|null;
 
     public function deleteMessage(string $key): void;
-    
+
 }

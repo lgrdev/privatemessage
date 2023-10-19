@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LgrDev\Storage;
@@ -19,22 +20,21 @@ class MemcacheDatabase extends StorageBase
      *
      * @var \Redis
      */
-    private $store =null;
+    private $store = null;
 
-    function __construct(Tools $tools)
+    public function __construct(Tools $tools)
     {
         $this->tools = $tools;
-        
+
         if (!$this->tools->issetEnv('mc_host') || !$this->tools->issetEnv('mc_port')) {
-            throw new \Exception('Parametres Memcached non fournis');    
-        }     
-        
+            throw new \Exception('Parametres Memcached non fournis');
+        }
+
         try {
             $this->store = new \Memcached('privatemessage');
 
             $this->store->addServer($this->tools->getEnv('mc_host'), intval($this->tools->getEnv('mc_port')));
-        }
-        catch(\MemcachedException $e) {
+        } catch(\MemcachedException $e) {
             // Handle any exceptions that occur during database connection.
             // You may want to log the error or take appropriate action depending on your application's needs.
             // In this example, we re-throw the exception to indicate a failed connection.
@@ -43,7 +43,7 @@ class MemcacheDatabase extends StorageBase
 
 
     }
-    
+
     /**
      * Add a message to Redis with encryption and set its expiration time.
      *
@@ -52,7 +52,7 @@ class MemcacheDatabase extends StorageBase
      *
      * @return string|null The key under which the message is stored in Redis or null if the message is empty.
      */
-    function addMessage(string $message, string $expiration): string|null
+    public function addMessage(string $message, string $expiration): string|null
     {
         // Check if the provided message is empty. If it is, return null immediately.
         if (empty($message)) {
@@ -61,7 +61,7 @@ class MemcacheDatabase extends StorageBase
 
         // Generate a unique key for the message using the createKey() method.
         $key = $this->tools->createMessageKey();
-        
+
         // Encrypt the message using the crypteMessage() method.
         $encryptedMessage = $this->tools->crypteMessage($message);
 
@@ -69,8 +69,8 @@ class MemcacheDatabase extends StorageBase
         $expire = $this->getExpiration($expiration);
 
         // Store the encrypted message in Redis with the generated key and specified expiration time.
-        $this->store->set($key, $encryptedMessage, $expire); 
-echo $key;
+        $this->store->set($key, $encryptedMessage, $expire);
+        echo $key;
         // Return the key under which the message is stored in Redis.
         return $key;
     }
@@ -97,7 +97,7 @@ echo $key;
 
                 // Decrypt the retrieved message using the tools->uncrypteMessage() method.
                 $message = $this->tools->uncrypteMessage($message);
-                
+
                 // Remove the key and its associated message from Redis.
                 $this->deleteMessage($key);
 
@@ -106,21 +106,20 @@ echo $key;
                 $message = null;
             }
         }
-echo $message;
+        echo $message;
         // Return the decrypted message or null if the key is empty or the message is not in Redis.
         return $message;
     }
 
-    public function deleteMessage(string $key): void 
+    public function deleteMessage(string $key): void
     {
         // Check if the provided key is not empty.
         if (!empty($key)) {
 
             // Remove the key and its associated message from Redis.
             $this->store->delete($key);
-echo $key;
+            echo $key;
         }
     }
 
 }
-?>

@@ -2,6 +2,9 @@ config.prod.php
 config.dev.php
 .env
 
+private_*.*
+
+
 /vendor/
 /sample/
 /cache/*.php

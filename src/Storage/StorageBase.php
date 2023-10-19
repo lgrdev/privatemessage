@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LgrDev\Storage;
@@ -7,17 +8,17 @@ namespace LgrDev\Storage;
  * Classe abstraite ayant 2 utilités :
  * - elle permet de déclarer l'interface utilisée par les classes RedisDatabase et PdoDatabase
  * - elle déclare l'implémentation de l'interface StorageIterface
- * 
+ *
  */
-abstract class StorageBase implements StorageInterface {
-    
+abstract class StorageBase implements StorageInterface
+{
     // La classe de base abstraite implémente l'interface StorageInterface.
     // Elle peut contenir des méthodes communes à toutes les classes dérivées.
 
-    const ONE_HOUR      = '1';
-    const ONE_DAY       = '2';
-    const FOUR_DAYS     = '3';
-    const SEVEN_DAYS    = '4';
+    public const ONE_HOUR      = '1';
+    public const ONE_DAY       = '2';
+    public const FOUR_DAYS     = '3';
+    public const SEVEN_DAYS    = '4';
 
     protected function getExpiration(string $expiration): int
     {
@@ -56,8 +57,8 @@ abstract class StorageBase implements StorageInterface {
             case self::SEVEN_DAYS:
                 $expireDateTime = $expireDateTime->add(new \DateInterval("P7D"));
                 break;
-            
-            default :
+
+            default:
                 // Message expires in +1 hour.
                 $expireDateTime = $expireDateTime->add(new \DateInterval("PT1H"));
                 break;

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LgrDev\Storage;
@@ -31,9 +32,9 @@ class PdoDatabase extends StorageBase // implements StorageInterface
     public function __construct(Tools $tools)
     {
         $this->tools = $tools;
-        
+
         if (!$this->tools->issetEnv('db_dsn') || !$this->tools->issetEnv('db_user')) {
-            throw new \Exception('Parametres PDO non fournis');    
+            throw new \Exception('Parametres PDO non fournis');
         }
 
         try {
@@ -66,14 +67,14 @@ class PdoDatabase extends StorageBase // implements StorageInterface
         // Initialize the key as null.
         $key = null;
 
-         // Check if the provided message is not empty.
+        // Check if the provided message is not empty.
         if (!empty($message)) {
             // Generate a unique key for the message using the createKey() method.
             $key = $this->tools->createMessageKey();
-              
+
             // Encrypt the message using the crypteMessage() method.
             $encryptedMessage = $this->tools->crypteMessage($message);
- 
+
             // Update the expiration time based on the provided expiration setting.
             $expireDateTime = $this->getDateTimeExpiration($expiration);
 
@@ -121,10 +122,10 @@ class PdoDatabase extends StorageBase // implements StorageInterface
 
                 // Check if a row was found and the message is not expired.
                 if ($row) {
-                    
+
                     // Decrypt the retrieved message using the tools->uncrypteMessage() method.
                     $message = $this->tools->uncrypteMessage($row['msgvalue']);
-                    
+
                     // delete message in database
                     $this->deleteMessage($key);
                 }
@@ -135,15 +136,15 @@ class PdoDatabase extends StorageBase // implements StorageInterface
         return $message;
     }
 
-    public function deleteMessage(string $key): void 
+    public function deleteMessage(string $key): void
     {
         // Check if the provided key is not empty.
         if (!empty($key)) {
-            
+
             // Prepare a SQL query to delete the message from the database table where the key matches.
             $stmt = $this->pdo->prepare('DELETE FROM privatemessage WHERE msgkey = ?');
             $stmt->bindParam(1, $key, \PDO::PARAM_STR);
-            
+
             // execute the query
             $stmt->execute();
 

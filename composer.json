@@ -10,7 +10,8 @@
         "ramsey/uuid": "^4.7",
         "predis/predis": "^2.2",
         "twig/twig": "^3.7",
-        "php-di/php-di": "^7.0"
+        "php-di/php-di": "^7.0",
+        "lgrdev/simplerouter": "^1.0"
     },
     "config": {
         "optimize-autoloader":true
