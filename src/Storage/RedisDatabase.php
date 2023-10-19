@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LgrDev\Storage;
@@ -19,14 +20,14 @@ class RedisDatabase extends StorageBase
      *
      * @var \Redis
      */
-    private $redis =null;
+    private $redis = null;
 
-    function __construct(Tools $tools)
+    public function __construct(Tools $tools)
     {
         $this->tools = $tools;
-        
+
         if (!$this->tools->issetEnv('redis_host') || !$this->tools->issetEnv('redis_port')) {
-            throw new \Exception('Parametres Redis non fournis');    
+            throw new \Exception('Parametres Redis non fournis');
         }
 
         try {
@@ -36,15 +37,14 @@ class RedisDatabase extends StorageBase
             if ($this->tools->issetEnv('redis_host')) {
                 $this->redis->auth($this->tools->getEnv('redis_auth'));
             }
-        }
-        catch (\RedisException $e) {
+        } catch (\RedisException $e) {
             // Handle any exceptions that occur during database connection.
             // You may want to log the error or take appropriate action depending on your application's needs.
             // In this example, we re-throw the exception to indicate a failed connection.
             throw $e;
-        }   
+        }
     }
-    
+
     /**
      * Add a message to Redis with encryption and set its expiration time.
      *
@@ -53,7 +53,7 @@ class RedisDatabase extends StorageBase
      *
      * @return string|null The key under which the message is stored in Redis or null if the message is empty.
      */
-    function addMessage(string $message, string $expiration): string|null
+    public function addMessage(string $message, string $expiration): string|null
     {
         // Check if the provided message is empty. If it is, return null immediately.
         if (empty($message)) {
@@ -62,7 +62,7 @@ class RedisDatabase extends StorageBase
 
         // Generate a unique key for the message using the createKey() method.
         $key = $this->tools->createMessageKey();
-        
+
         // Encrypt the message using the crypteMessage() method.
         $encryptedMessage = $this->tools->crypteMessage($message);
 
@@ -70,7 +70,7 @@ class RedisDatabase extends StorageBase
         $expire = $this->getExpiration($expiration);
 
         // Store the encrypted message in Redis with the generated key and specified expiration time.
-        $this->redis->set($key, $encryptedMessage, $expire); 
+        $this->redis->set($key, $encryptedMessage, $expire);
 
         // Return the key under which the message is stored in Redis.
         return $key;
@@ -110,7 +110,7 @@ class RedisDatabase extends StorageBase
         return $message;
     }
 
-    public function deleteMessage(string $key): void 
+    public function deleteMessage(string $key): void
     {
         // Check if the provided key is not empty.
         if (!empty($key)) {
@@ -122,4 +122,3 @@ class RedisDatabase extends StorageBase
     }
 
 }
-?>

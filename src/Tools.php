@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LgrDev;
@@ -29,7 +30,7 @@ class Tools
         if ($pathenvfile != null) {
             $file = $pathenvfile;
         } else {
-            $file = dirname(__FILE__,2).'/.env';
+            $file = dirname(__FILE__, 2) . '/.env';
         }
 
         $this->loadEnv($file);
@@ -43,12 +44,12 @@ class Tools
     }
 
     /**
-     * Charge le fichier .env dans le tableau $arrEnv[] 
+     * Charge le fichier .env dans le tableau $arrEnv[]
      *
      * @param string $path
      * @return void
      */
-    public function loadEnv(string $path) :void
+    public function loadEnv(string $path): void
     {
         if (!is_readable($path)) {
             throw new \RuntimeException(sprintf('%s file is not readable', $path));
@@ -101,11 +102,11 @@ class Tools
 
             }
 
-        }   
-        
+        }
+
         return $value;
     }
-    
+
     /**
      * Affecte une valeur à une variable d'environnement
      *
@@ -113,7 +114,7 @@ class Tools
      * @param string $value
      * @return boolean
      */
-    public function setEnv(string $variable,string $value): bool
+    public function setEnv(string $variable, string $value): bool
     {
         $bReturn = false;
 
@@ -121,8 +122,8 @@ class Tools
 
             $this->arrEnv[$variable] = $value ;
             $bReturn = true;
-        }   
-        
+        }
+
         return $bReturn;
     }
 
@@ -210,4 +211,3 @@ class Tools
         return $token;
     }
 }
-

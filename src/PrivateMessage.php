@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace LgrDev;
 
+use LgrDev\Storage\RedisDatabase;
 use Twig\Environment;
-use LgrDev\Storage\StorageBase;
 
 class PrivateMessage
 {
@@ -19,7 +19,7 @@ class PrivateMessage
     /**
      * Undocumented variable
      *
-     * @var LgrDev\Storage\StorageBase
+     * @var LgrDev\Storage\RedisDatabase
      */
     private $stockage;
 
@@ -30,59 +30,65 @@ class PrivateMessage
      */
     private $tools;
 
-    public function __construct(StorageBase $redis, Tools $tools, Environment $twig)
+    public function __construct(RedisDatabase $redis, Tools $tools, Environment $twig)
     {
         $this->stockage = $redis;
         $this->tools    = $tools;
         $this->twig     = $twig;
     }
 
-    private function displayMessageKey()
+    public function displayResultKey(): callable
     {
-        // Get the comment and set the expiration time
-        $message = $_POST['comment'];
-        $expirein = (isset($_POST['expirein']) && !empty($_POST['expirein'])) ? $_POST['expirein'] : '1';
+        return function () {
+            // Get the comment and set the expiration time
+            $message = $_POST['comment'];
+            $expirein = (isset($_POST['expirein']) && !empty($_POST['expirein'])) ? $_POST['expirein'] : '1';
 
-        // Add the message to storage and get its unique key
-        $key = $this->stockage->addMessage($message, $expirein);
+            // Add the message to storage and get its unique key
+            $key = $this->stockage->addMessage($message, $expirein);
 
-        // Generate a link for the user to access the secret message
-        $link = 'https://' . $_SERVER['HTTP_HOST'] . '/?secret=' . $key;
+            // Generate a link for the user to access the secret message
+            $link = 'https://' . $_SERVER['HTTP_HOST'] . '/message/' . $key;
 
-        // Render the 'linksecret.twig' template with the link
-        echo $this->twig->render('linksecret.twig', ["link" => $link]);
+            // Render the 'linksecret.twig' template with the link
+            echo $this->twig->render('linksecret.twig', ["link" => $link]);
+        };
     }
 
-    private function displayMessage()
+    public function displayMessage(): callable
     {
-        // Retrieve the secret key from the URL
-        $key = $_GET['secret'];
+        return function (string $key) {
+            // Retrieve the Id message from the URL
+            // $key = $_GET['id'];
 
-        // Get the message associated with the key from storage
-        $message = $this->stockage->getMessage($key);
+            // Get the message associated with the key from storage
+            $message = $this->stockage->getMessage($key);
 
-        if ($message == '') {
-            // If the message is empty, indicate that it doesn't exist or has already been read
-            $message = "Message inexistant ou déjà lu.";
-        }
+            if ($message == '') {
+                // If the message is empty, indicate that it doesn't exist or has already been read
+                $message = "Message inexistant ou déjà lu.";
+            }
 
-        // Render the 'readsecret.twig' template with the secret message
-        echo $this->twig->render('readsecret.twig', ["secret" => $message]);
+            // Render the 'readsecret.twig' template with the secret message
+            echo $this->twig->render('readsecret.twig', ["secret" => $message]);
+        };
     }
 
-    private function displayIndex()
+    public function displayIndex(): callable
     {
-        // Generate a new CSRF token
-        $token = $this->tools->generate_csrf_token();
-
-        // Store the CSRF token in the session for future submissions
-        $_SESSION["csrf_token"] = $token;
-
-        // Render the 'newsecret.twig' template with the CSRF token
-        echo $this->twig->render('newsecret.twig', ["Token" => $token]);
+        return function () {
+            // Generate a new CSRF token
+            $token = $this->tools->generate_csrf_token();
+    
+            // Store the CSRF token in the session for future submissions
+            $_SESSION["csrf_token"] = $token;
+    
+            // Render the 'newsecret.twig' template with the CSRF token
+            echo $this->twig->render('newsecret.twig', ["Token" => $token]);
+        };
     }
 
-    public function index()
+    public function index(): callable
     {
         // Check if the form has been submitted
         if (isset($_POST['comment']) && !empty($_POST['comment'])) {
@@ -94,7 +100,7 @@ class PrivateMessage
                 die("CSRF token validation failed");
             }
 
-            $this->displayMessageKey();
+            $this->displayResultKey();
 
         } elseif (isset($_GET['secret']) && !empty($_GET['secret'])) {
 
