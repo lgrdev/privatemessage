@@ -35,9 +35,7 @@ class MemcacheDatabase extends StorageBase
 
             $this->store->addServer($this->tools->getEnv('mc_host'), intval($this->tools->getEnv('mc_port')));
         } catch(\MemcachedException $e) {
-            // Handle any exceptions that occur during database connection.
-            // You may want to log the error or take appropriate action depending on your application's needs.
-            // In this example, we re-throw the exception to indicate a failed connection.
+            $this->tools->logger->error($e->getMessage());
             throw $e;
         }
 
@@ -109,6 +107,34 @@ class MemcacheDatabase extends StorageBase
         echo $message;
         // Return the decrypted message or null if the key is empty or the message is not in Redis.
         return $message;
+    }
+
+    /**
+     * Return 1 if the key exist in database or 0 if not.
+     *
+     * @param string $key The key to retrieve the message from memcached.
+     *
+     * @return int The key exist or not
+     */
+    public function statusMessage(string $key): int
+    {
+        // Initialize the variable as 0.
+        $existKey = 0;
+
+        // Check if the provided key is empty or null.
+        if (!empty($key)) {
+            
+            // Retrieve the message associated with the key from memcached.
+            $message = $this->store->get($key);
+
+            // Check if a message was found in memcached
+            if ($message !== false) {
+                $existKey=1;
+            }
+        }
+
+        // Return 1 if key exist or 0 if not.
+        return $existKey;
     }
 
     public function deleteMessage(string $key): void

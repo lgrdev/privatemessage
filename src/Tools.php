@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace LgrDev;
 
 use Ramsey\Uuid\Uuid;
+use Monolog\Logger; // The Logger instance
+use Logtail\Monolog\LogtailHandler;
+
 
 /**
  * Utility class for various functions including message encryption and key generation.
@@ -19,6 +22,14 @@ class Tools
      */
     private $keyAES128 = 'GmGknh+uKR/Pub5Q34h+4Z+9yLvRPp1ylrhn22EftwL5mhy4yQvEo8dOOsYYmpPJ';
     private $arrEnv = [];
+
+    /**
+     * Instance de la classe Logger
+     *
+     * @var Logger
+     */
+    public $logger;
+
 
     /**
      * Constructeur de la classe Tools
@@ -39,6 +50,14 @@ class Tools
 
             $this->keyAES128 = $this->getEnv('AES128_KEY');
 
+        }
+
+
+        $this->logger = new Logger("my_logger");
+        if ($this->issetEnv('bs_token')) {
+            $this->logger->pushHandler(new LogtailHandler($this->getEnv('bs_token')));
+        } else {
+        
         }
 
     }
@@ -210,4 +229,117 @@ class Tools
 
         return $token;
     }
+
+    /**
+     * Verify a CSRF (Cross-Site Request Forgery) token.
+     *
+     * @param string $token The token to be verified.
+     *
+     * @return bool True if the token is valid, false otherwise.
+     */
+    public function verify_csrf_token(string $token): bool
+    {
+        // Check if a token is present for the current session.
+        if (!isset($_SESSION["csrf_token"])) {
+            // No token present, return false.
+            return false;
+        }
+
+        // Check if the token is valid.
+        if ($_SESSION["csrf_token"] !== $token) {
+            // Invalid token, return false.
+            return false;
+        }
+
+        // Token is valid.
+        return true;
+    }
+
+    public function verifiyAuthenication(): bool
+    {
+        $auth = $_SERVER["HTTP_" . strtoupper(str_replace("-","_","Authorization"))];
+        if (isset( $auth) && !empty($auth))
+        {
+
+            $head = explode(":", $auth);
+            $login = $head[0];
+            $apikey = $head[1];
+
+            if (isset($login) && !empty($login) && isset($apikey) && !empty($apikey))
+            {
+                $pdo = new \PDO($this->getEnv('db_dsn'), $this->getEnv('db_user'), $this->getEnv('db_password'));
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+                $sql = "SELECT * FROM pmapiusers WHERE login = :login AND apikey = :apikey";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':login', $login, \PDO::PARAM_STR);
+                $stmt->bindParam(':apikey', $apikey, \PDO::PARAM_STR);
+                $stmt->execute();
+                $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+                if ($result)
+                {
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
+    }
+
+    public function verifiyUserAccess(string $login,string $password): bool
+    {
+        $pdo = new \PDO($this->getEnv('db_dsn'), $this->getEnv('db_user'), $this->getEnv('db_password'));
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT * FROM pmapiusers WHERE login = :login AND password = :password";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':login', $login, \PDO::PARAM_STR);
+        $stmt->bindParam(':password', $password, \PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($result)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function existLogin(string $login): bool
+    {
+        $pdo = new \PDO($this->getEnv('db_dsn'), $this->getEnv('db_user'), $this->getEnv('db_password'));
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT * FROM pmapiusers WHERE login = :login";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':login', $login, \PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($result)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function createUser(string $login,string $password): bool
+    {   
+        $pdo = new \PDO($this->getEnv('db_dsn'), $this->getEnv('db_user'), $this->getEnv('db_password'));
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $sql = "INSERT INTO pmapiusers (login, password, apikey) VALUES (:login, :password, :apikey)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':login', $login, \PDO::PARAM_STR);
+        $stmt->bindParam(':password', $password, \PDO::PARAM_STR);
+        $stmt->bindParam(':apikey', bin2hex(random_bytes(32)), \PDO::PARAM_STR);
+        $stmt->execute();
+
+        return true;
+    }
+
 }

@@ -42,3 +42,10 @@ $ nano .env
 2. If you use an other database than Redis, update by comment and uncomment the file config/config.php
 
 
+## twig templates
+
+in directory templates, you can add 3 "privates" files to customize this site :
+
+private_header.twig : add meta in the header
+private_scripts.twig : add javascript file include
+private_footer.twig : add footer supplement.

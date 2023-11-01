@@ -1,0 +1,151 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+		<div class="col">
+					<h2 class="text-center bg-primary">Documentation API</h2>
+					<div class="accordion accordion-flush" id="accordionFlushExample">
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="flush-heading0">
+						      	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse0" aria-expanded="false" aria-controls="flush-collapse0">
+									<span class="badge text-bg-success">Apikey</span>&nbsp;Votre clé d'api
+      							</button>
+    						</h2>
+							<div id="flush-collapse0" class="accordion-collapse collapse show" aria-labelledby="flush-heading0" data-bs-parent="#accordionFlushExample">
+      							<div class="accordion-body">
+								Mail : {{ Mail }}<br>
+								Key : {{ Apikey }}
+								</div>
+							</div>
+						</div>
+						<!-- Create a new message -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="flush-heading1">
+						      	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse1" aria-expanded="false" aria-controls="flush-collapse1">
+        							<span class="badge text-bg-primary">POST</span>&nbsp;Créer un nouveau message &nbsp;
+									<div class="text-primary">https://privatemessage.ovh/api/v1/message</div>
+      							</button>
+    						</h2>
+							<div id="flush-collapse1" class="accordion-collapse collapse" aria-labelledby="flush-heading1" data-bs-parent="#accordionFlushExample">
+      							<div class="accordion-body">
+									<h6>Header</h6>
+									<table class="table">
+										<thead>
+											<tr class="table-primary">
+												<th scope="col">Field</th>
+												<th scope="col">Type</th>
+												<th scope="col">Description</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+											<td>Authorization <span class="badge text-bg-danger">Requis</span></td>
+											<td>string</td>
+											<td>Authentification avec email:apikey<br>{{ Mail }}:{{Apikey}}</td>
+											</tr>
+										</tbody>
+									</table>
+									<h6>Body</h6>
+									<p class="text-white bg-dark mt-1">
+									{<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;"expire": "1h",<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;"content": "string"<br>
+									}
+									</p>
+									<h6>Response</h6>
+									<span class="badge text-bg-success">200</span>
+									<p class="text-white bg-dark mt-1">
+									{<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;"key": "xxxxxxxxxxxxxxx"<br>
+									}
+									</p>
+									<p><span class="badge text-bg-danger">400</span>&nbsp;bad request<br><span class="badge text-bg-danger">401</span>&nbsp;unauthorized</p>
+
+								</div>
+    						</div>	
+						</div>
+						<!-- End create a new message -->
+						<!-- Message exist ? -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="flush-heading2">
+						      	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse2" aria-expanded="false" aria-controls="flush-collapse2">
+        							<span class="badge text-bg-warning">GET</span>&nbsp;Le message existe toujours ?&nbsp;
+									<div class="text-primary">https://privatemessage.ovh/api/v1/status/{id}</div>
+      							</button>
+    						</h2>
+							<div id="flush-collapse2" class="accordion-collapse collapse" aria-labelledby="flush-heading2" data-bs-parent="#accordionFlushExample">
+      							<div class="accordion-body">
+									<h6>Header</h6>
+									<table class="table">
+										<thead>
+											<tr class="table-primary">
+												<th scope="col">Field</th>
+												<th scope="col">Type</th>
+												<th scope="col">Description</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+											<td>Authorization <span class="badge text-bg-danger">Requis</span></td>
+											<td>string</td>
+											<td>Authentification avec email:apikey<br>{{ Mail }}:{{Apikey}}</td>
+											</tr>
+										</tbody>
+									</table>
+									<h6>Response</h6>
+									<span class="badge text-bg-success">200</span>
+									<p class="text-white bg-dark mt-1">
+									{<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;"Message": "Key is valide"<br>
+									}
+									</p>
+									<p><span class="badge text-bg-danger">400</span>&nbsp;bad request<br><span class="badge text-bg-danger">401</span>&nbsp;unauthorized</p>
+
+								</div>
+    						</div>	
+						</div>
+						<!-- End Message exist ? -->
+						<!-- Delete message -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="flush-heading3">
+						      	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse3" aria-expanded="false" aria-controls="flush-collapse3">
+        							<span class="badge text-bg-danger">DEL</span>&nbsp;Suppression d'un message&nbsp;
+									<div class="text-primary">https://privatemessage.ovh/api/v1/message/{id}</div>
+      							</button>
+    						</h2>
+							<div id="flush-collapse3" class="accordion-collapse collapse" aria-labelledby="flush-heading3" data-bs-parent="#accordionFlushExample">
+      							<div class="accordion-body">
+									<h6>Header</h6>
+									<table class="table">
+										<thead>
+											<tr class="table-primary">
+												<th scope="col">Field</th>
+												<th scope="col">Type</th>
+												<th scope="col">Description</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+											<td>Authorization <span class="badge text-bg-danger">Requis</span></td>
+											<td>string</td>
+											<td>Authentification avec email:apikey<br>{{ Mail }}:{{Apikey}}</td>
+											</tr>
+										</tbody>
+									</table>
+									<h6>Body</h6>
+									<p class="text-white bg-dark mt-1">
+									{<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;"expire": "1h",<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;"content": "string"<br>
+									}
+									</p>
+									<h6>Response</h6>
+									<span class="badge text-bg-success">200</span>
+									<p><span class="badge text-bg-danger">400</span>&nbsp;bad request<br><span class="badge text-bg-danger">401</span>&nbsp;unauthorized</p>
+								</div>
+    						</div>	
+						</div>
+						<!-- End delete message -->
+					</div>
+		</div>
+{% endblock %}
+

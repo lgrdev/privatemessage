@@ -1,0 +1,36 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+	<div class="row">
+		<div class="col">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="card-title text-center">Créer un compte</h6>
+				</div>
+				<div class="card-body">
+					<form  id="myForm" class="needs-validation" novalidate>
+						{% include 'items/field_email.twig' with {'id': 'login'} %}
+						{% include 'items/field_password.twig' with {'id': 'validationPassword' , 'type':'first'} %}
+						{% include 'items/field_password.twig' with {'id': 'repeatPassword', 'type':'second'} %}
+						{% include 'items/field_submit.twig' with {'Module': 'Signup','Token':'{{ Token }}'} %}
+						{% include 'items/field_error.twig' %}
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="card-title text-center">APIs</h6>
+				</div>
+				<div class="card-body">
+					<h5 class="card-title">Création d'un compte</h5>
+					<p class="card-text">La création d'un compte vous permettra d'obtenir une APIKEY que vous utiliserez lors de vos appels aux APIs.</p>
+					<p class="card-text">N'ayant pas de news letters ni de besoins commerciaux ni de partenaires envahissants, vous ne serez jamais ennuyés par nos mails...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="assets/js/valideform.js"></script>
+
+{% endblock %}

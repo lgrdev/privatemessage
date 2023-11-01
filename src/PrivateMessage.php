@@ -90,6 +90,7 @@ class PrivateMessage
 
     public function index(): callable
     {
+        return function () {
         // Check if the form has been submitted
         if (isset($_POST['comment']) && !empty($_POST['comment'])) {
 
@@ -112,6 +113,147 @@ class PrivateMessage
             $this->displayIndex();
 
         }
+        };
     }
 
+    /**
+     * Display the account signin form.
+     *
+     * @return callable
+     */
+    public function displayAccountSignin(): callable
+    {
+        return function () {
+            $token = $this->tools->generate_csrf_token();
+        
+            // Store the CSRF token in the session for future submissions
+            $_SESSION["csrf_token"] = $token;
+
+            $this->tools->logger->info('Display signin form');
+
+            // Render the 'newsecret.twig' template with the CSRF token
+            echo $this->twig->render('accountsignin.twig', ["Token" => $token]);        
+        };
+    }
+    
+    /**
+     * Display the account signup form.
+     *
+     * @return callable
+     */
+    public function displayAccountSignup(): callable
+    {
+        return function () {
+            $token = $this->tools->generate_csrf_token();
+        
+            // Store the CSRF token in the session for future submissions
+            $_SESSION["csrf_token"] = $token;
+
+            $this->tools->logger->info('Display signup form');
+
+            // Render the 'newsecret.twig' template with the CSRF token
+            echo $this->twig->render('accountsignup.twig', ["Token" => $token]);        
+        };
+    }
+    
+    /**
+     * Display the account of the user.
+     *
+     * @return callable
+     */
+    public function displayAccount(): callable
+    {
+        return function () {
+
+            // Render the 'newsecret.twig' template with the CSRF token
+            echo $this->twig->render('accountview.twig', ["Mail" => $_SESSION["Mail"], "Apikey" => $_SESSION["Apikey"]]);        
+            
+        };
+    }
+
+    public function apiCreateMessage(): callable
+    {
+        return function () {
+
+            if (!$this->tools->verifiyAuthenication()) {
+                http_response_code(401);
+                echo json_encode(["Error" => "Authentification failed"]);        
+                return;
+            }
+            
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if (isset($data['expirein']) && !empty($data['expirein'])) {
+                $expirein = $data['expirein'];
+            } else {
+                $expirein = '1';
+            }
+            if (isset($data['message']) && !empty($data['message'])) {
+                $message = $data['message'];
+            } else {
+                http_response_code(400);
+                echo json_encode(["Error" => "bad request","Message" => 'Message vide.']);
+                return;
+            }
+
+            // Add the message to storage and get its unique key
+            $key = $this->stockage->addMessage($message, $expirein);
+
+            if (isset($key) && !empty($key)) {
+                http_response_code(200);
+                echo json_encode(["Key" => $key]);        
+            } else {
+                http_response_code(400);
+                echo json_encode(["Error" => "bad request","Message" => 'Message vide.']);
+            }
+
+        };
+
+    }
+
+    public function apiGetMessage(): callable
+    {
+        return function (string $key) {
+
+            if (!$this->tools->verifiyAuthenication()) {
+                http_response_code(401);
+                echo json_encode(["Error" => "Authentification failed"]);        
+                return;
+            }
+            
+            $message = $this->stockage->getMessage($key);
+
+            if ($message == '') {
+                // If the message is empty, indicate that it doesn't exist or has already been read
+                http_response_code(400);
+                echo json_encode(["Error" => "bad request","Message" => 'Message inexistant ou déjà lu.']);
+                return;
+            }
+
+            // Render the 'newsecret.twig' template with the CSRF token
+            http_response_code(200);
+            echo json_encode(["Message" => $message]);        
+        };
+
+    }
+
+    public function apiDeleteMessage(): callable
+    {
+        return function (string $key) {
+
+            if (!$this->tools->verifiyAuthenication()) {
+                http_response_code(401);
+                echo json_encode(["Error" => "Authentification failed"]);        
+                return;
+            }
+
+            $this->stockage->deleteMessage($key);
+
+            http_response_code(200);
+            echo json_encode(["Message" => 'Message supprimé.']);          
+            
+        };
+
+    }
 }
