@@ -47,9 +47,7 @@ class PdoDatabase extends StorageBase // implements StorageInterface
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         } catch (\PDOException $e) {
-            // Handle any exceptions that occur during database connection.
-            // You may want to log the error or take appropriate action depending on your application's needs.
-            // In this example, we re-throw the exception to indicate a failed connection.
+            $this->tools->logger->error($e->getMessage());
             throw $e;
         }
     }
@@ -134,6 +132,42 @@ class PdoDatabase extends StorageBase // implements StorageInterface
 
         // Return the decrypted message or null if the key is empty, no row is found, or the message is expired.
         return $message;
+    }
+
+    /**
+     * Return 1 if the key exist in database or 0 if not.
+     *
+     * @param string $key The key to retrieve the message from pdo.
+     *
+     * @return int The key exist or not
+     */
+    public function statusMessage(string $key): int
+    {
+        // Initialize the variable as 0.
+        $existKey = 0;
+
+        // Check if the provided key is empty or null.
+        if (!empty($key)) {
+            
+            $stmt = $this->pdo->prepare('SELECT msgvalue FROM privatemessage WHERE msgkey = ?');
+            $stmt->bindParam(1, $key, \PDO::PARAM_STR);
+
+            // Check if a message was found in pdo
+            if ($stmt->execute()) {
+
+                // Fetch the row from the result.
+                $row = $stmt->fetch();
+
+                // Check if a row was found and the message is not expired.
+                if ($row) {
+
+                    $existKey = 1;
+                }
+            }
+        }
+
+        // Return 1 if key exist or 0 if not.
+        return $existKey;
     }
 
     public function deleteMessage(string $key): void

@@ -1,0 +1,22 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+	<div class="row justify-content-center">
+		<div class="col-4">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="card-title text-center">Sign in</h6>
+				</div>
+				<div class="card-body">
+					<form  id="myForm" class="needs-validation" novalidate>
+						{% include 'items/field_email.twig' with {'id': 'login'} %}
+						{% include 'items/field_password.twig' with {'id': 'validationPassword' , 'type':'first'} %}
+						{% include 'items/field_submit.twig' with {'Module': 'Signin','Token':'{{ Token }}'} %}
+						{% include 'items/field_error.twig' %}
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="assets/js/valideform.js"></script>
+{% endblock %}

@@ -27,6 +27,15 @@ interface StorageInterface
      */
     public function getMessage(string $key): string|null;
 
+    /**
+     * Return 1 if the key exist in database or 0 if not.
+     *
+     * @param string $key The key to retrieve the message from pdo.
+     *
+     * @return int The key exist or not
+     */
+    public function statusMessage(string $key): int;
+
     public function deleteMessage(string $key): void;
 
 }

@@ -26,4 +26,9 @@ return [
         DI\get(\LgrDev\Tools::class),
         DI\get(Environment::class)
     ),
+    
+    \LgrDev\Api::class => DI\create()->constructor(
+        DI\get(\LgrDev\Storage\RedisDatabase::class),
+        DI\get(\LgrDev\Tools::class)
+    ),
 ];
