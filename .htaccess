@@ -1,8 +1,0 @@
-# Restriction des adresses IP
-# Ordre de priorité des instructions : refuser puis autoriser
-Order Deny,Allow
-# On n’autorise personne à accéder au site…
-Deny from all
-# …Sauf l’adresse IP x.x.x.x
-Allow from 82.66.56.51
-
