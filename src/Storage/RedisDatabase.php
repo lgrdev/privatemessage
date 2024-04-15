@@ -34,7 +34,7 @@ class RedisDatabase extends StorageBase
             $this->redis = new \Redis();
             $this->redis->connect($this->tools->getEnv('redis_host'), intval($this->tools->getEnv('redis_port')));
 
-            if ($this->tools->issetEnv('redis_host')) {
+            if ($this->tools->issetEnv('redis_auth')) {
                 $this->redis->auth($this->tools->getEnv('redis_auth'));
             }
         } catch (\RedisException $e) {
